@@ -1,0 +1,37 @@
+CC=g++
+
+ANALIZADORES=Analizadores
+FECHA = fecha
+SOCKET_DIR=Socket
+SOCKET=${SOCKET_DIR}/Socket
+EJEC = Analizadores
+
+
+CPPFLAGS=-I. -I${SOCKET_DIR} -O2 -std=c++11 -lsockets # Flags compilacion
+LDFLAGS=-pthread # Flags linkado threads
+#----------------------------------------------------------------------------
+#Para gestionar opciones de compilación según la máquina: hendrix tiene sus manías
+#Descomentar la siguiente línea para compilar en hendrix
+#SOCKETSFLAGS=-lsocket -lnsl
+#-----------------------------------------------------------
+# ANALIZADORES
+
+# Linkado
+${ANALIZADORES}: ${SOCKET}.o ${FECHA}.o ${ANALIZADORES}.o  
+	${CC} ${LDFLAGS} ${SOCKET}.o ${ANALIZADORES}.o -o ${EJEC} ${SOCKETSFLAGS}
+# Compilacion
+${ANALIZADORES}.o: ${ANALIZADORES}.cpp
+	${CC} -c ${CPPFLAGS} ${ANALIZADORES}.cpp
+
+#-----------------------------------------------------------
+# SOCKETS
+# Compilacion libreria de Sockets
+${SOCKET}.o: ${SOCKET}.hpp ${SOCKET}.cpp
+	${CC} -c ${CPPFLAGS} ${SOCKET}.cpp -o ${SOCKET}.o
+
+
+#-----------------------------------------------------------
+# LIMPIEZA
+clean:
+	$(RM) ${SOCKET}.o
+	$(RM) ${ANALIZADORES} ${ANALIZADORES}.o
