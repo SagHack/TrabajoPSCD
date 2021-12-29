@@ -1,0 +1,42 @@
+#*****************************************************************
+# File:   Makefile_master
+# Author: 
+# Date:   diciembre 2021
+# Coms:   Makefile para el proceso master del trabajo de PSCD
+#         "make -f Makefile_master" construye todos los ejecutables
+#*****************************************************************
+
+#---------------------------------------------------------
+CC=g++
+
+MASTER=master
+SOCKET_DIR=Socket
+SOCKET=${SOCKET_DIR}/Socket
+
+CPPFLAGS=-I. -I${SOCKET_DIR} -O2 -std=c++11 -lsockets # Flags compilacion
+LDFLAGS=-pthread # Flags linkado threads
+
+all: ${MASTER}
+#----------------------------------------------------------------------------
+#Para gestionar opciones de compilación según la máquina: hendrix tiene sus manías
+#Descomentar la siguiente línea para compilar en hendrix
+SOCKETSFLAGS=-lsocket -lnsl
+#-----------------------------------------------------------
+# MASTER
+# Compilacion
+${MASTER}.o: ${MASTER}.cpp 
+	${CC} -c ${CPPFLAGS} ${MASTER}.cpp
+
+# Linkado
+${MASTER}: ${SOCKET}.o ${MASTER}.o
+	${CC} ${LDFLAGS} ${SOCKET}.o ${MASTER}.o -o ${MASTER} ${SOCKETSFLAGS}
+#-----------------------------------------------------------
+# SOCKETS
+# Compilacion libreria de Sockets
+${SOCKET}.o: ${SOCKET}.hpp ${SOCKET}.cpp
+	${CC} -c ${CPPFLAGS} ${SOCKET}.cpp -o ${SOCKET}.o
+#-----------------------------------------------------------	
+# LIMPIEZA
+clean:
+	$(RM) ${SOCKET}.o
+	$(RM) ${MASTER} ${MASTER}.o
