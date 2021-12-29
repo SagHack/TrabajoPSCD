@@ -14,6 +14,8 @@ int main(int argc, char* argv[]){
     cout << "A la espera de conexión" << endl;
 
 
+
+
     int STREAMING_MASTER_PORT = atoi(argv[1]);
     Socket chanStreaming(STREAMING_MASTER_PORT);
     // Conectamos con el servidor. Probamos varias conexiones
@@ -66,8 +68,8 @@ int main(int argc, char* argv[]){
 
     while(true){
 
-        
-        cout << "A la espera de una peticion en: " << streaming_fd << endl;
+
+        cout << "A la espera de una peticion" << endl;
         int rcv_bytes = chanStreaming.Recv(streaming_fd, buffer, length);
         if(rcv_bytes == -1) {
             string mensError(strerror(errno));
@@ -79,7 +81,7 @@ int main(int argc, char* argv[]){
         cout << "Mensaje recibido: '" + buffer + "'\n";
 
         if(buffer == "PETICION"){
-            cout << "Empezamos a preparar el paquete" << endl;
+
 
 
 
@@ -93,7 +95,8 @@ int main(int argc, char* argv[]){
                     vaBien = true;
 
                     fechaaux = "";  
-                    while(charaux!=';' && charaux !='\n'){
+                    while(charaux!=';' && charaux !='\n' && !f.eof()){
+
                         f.get(charaux);
                         fechaaux = fechaaux + charaux;
                     }
@@ -103,7 +106,8 @@ int main(int argc, char* argv[]){
 
                     //getline(f, aplicacion, ';');
                     aplicacion = "";  
-                    while(charaux!=';' && charaux !='\n' && vaBien){
+                    while(charaux!=';' && charaux !='\n'  && !f.eof() && vaBien){
+
                         f.get(charaux);
                         aplicacion = aplicacion + charaux;
                     }
@@ -112,7 +116,8 @@ int main(int argc, char* argv[]){
                     
                     //getline(f, basura, ';');
                     autor = "";  
-                    while(charaux!=';' && charaux !='\n' && vaBien){
+                    while(charaux!=';' && charaux !='\n'  && !f.eof() && vaBien){
+
                         f.get(charaux);
                         autor = autor + charaux;
                     }
@@ -121,10 +126,11 @@ int main(int argc, char* argv[]){
 
 
 
-                    if(vaBien){
+                    if(vaBien && !f.eof()){
                         mensaje = mensaje + fechaaux + aplicacion + autor;
                 
                         do{
+
                             f.get(charaux);
                             if((charaux >= 'a' && charaux <= 'z')||(charaux >= '@' && charaux <= 'Z')||(charaux >= ','&&charaux <= ';' )||
                             charaux == ' ' || charaux == '_' || charaux == '#' || charaux == -61){
@@ -146,7 +152,7 @@ int main(int argc, char* argv[]){
 
                             }
 
-                        }while(charaux!='\n');
+                        }while(charaux!='\n' && !f.eof());
                         mensaje = mensaje + SEPARADOR;
                     
                     }
@@ -154,6 +160,8 @@ int main(int argc, char* argv[]){
                         i--;//no se ha añadido el tweet al string, dejamos hueco para uno mas
                     }
                     else{//identico al caso anterior pero reabre el fichero y elimina la primera linea que no es un tweet
+
+
                         f.close();
                         f.open(nombrefichero);
                         getline(f,basura);
@@ -174,7 +182,7 @@ int main(int argc, char* argv[]){
                     exit(1);
                 }
                 
-                cout << "se ha enviado el mensaje " << endl;
+                cout << "se ha enviado el paquete " << endl;
                 buffer = "";
 
                 
