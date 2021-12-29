@@ -11,7 +11,6 @@ const int TAMANNO_PAQUETE = 25;
 const string SEPARADOR = "\n";
 
 int main(int argc, char* argv[]){
-
     cout << "A la espera de conexión" << endl;
 
 
@@ -20,10 +19,9 @@ int main(int argc, char* argv[]){
     // Conectamos con el servidor. Probamos varias conexiones
     const int MAX_ATTEMPS = 10;
     int count = 0;
-    int socketStreaming_fd;
 
-    int socketstreaming_fd = chanStreaming.Bind();
-    if (socketstreaming_fd == -1) {
+    int socketStreaming_fd = chanStreaming.Bind();
+    if (socketStreaming_fd == -1) {
         cerr << "Error en el bind: " + string(strerror(errno)) + "\n";
         exit(1);
     }
@@ -34,17 +32,16 @@ int main(int argc, char* argv[]){
     if (error_code == -1) {
         cerr << "Error en el listen: " + string(strerror(errno)) + "\n";
         // Cerramos el socket
-        chanStreaming.Close(socketstreaming_fd);
+        chanStreaming.Close(socketStreaming_fd);
         exit(1);
     }
 
     // Accept
-    socketstreaming_fd = chanStreaming.Accept();
-
-    if(socketstreaming_fd == -1) {
+    int streaming_fd = chanStreaming.Accept();
+    if(streaming_fd == -1) {
         cerr << "Error en el accept: " + string(strerror(errno)) + "\n";
         // Cerramos el socket
-        chanStreaming.Close(socketstreaming_fd);
+        chanStreaming.Close(socketStreaming_fd);
         exit(1);
     }
 
@@ -70,9 +67,8 @@ int main(int argc, char* argv[]){
     while(true){
 
         
-        cout << "A la espera de una peticion" << endl;
-
-        int rcv_bytes = chanStreaming.Recv(socketStreaming_fd, buffer, length);
+        cout << "A la espera de una peticion en: " << streaming_fd << endl;
+        int rcv_bytes = chanStreaming.Recv(streaming_fd, buffer, length);
         if(rcv_bytes == -1) {
             string mensError(strerror(errno));
             cerr << "Error al recibir datos: " + mensError + "\n";
@@ -83,11 +79,14 @@ int main(int argc, char* argv[]){
         cout << "Mensaje recibido: '" + buffer + "'\n";
 
         if(buffer == "PETICION"){
-            bool paquetePreparado = false;
+            cout << "Empezamos a preparar el paquete" << endl;
 
-            while(!paquetePreparado){
+
+
+
                 string mensaje = "";
                 for(int i= 0; i<TAMANNO_PAQUETE; i++){
+
 
                     //getline(f, fechaaux, ';');
                     charaux = ' ';
@@ -162,9 +161,9 @@ int main(int argc, char* argv[]){
                     }
                 }
 
+
                 //el paquete ahora siempre es completo
-                paquetePreparado = true; //cerramos el bucle y esperamos otra peticion
-                int send_bytes = chanStreaming.Send(socketStreaming_fd, mensaje);
+                int send_bytes = chanStreaming.Send(streaming_fd, mensaje);
 
                 
 
@@ -176,12 +175,13 @@ int main(int argc, char* argv[]){
                 }
                 
                 cout << "se ha enviado el mensaje " << endl;
+                buffer = "";
 
                 
                 
 
                 
-            }
+            
         }
         else{
             cout << "el programa no sabe que hacer con este mensaje: " << buffer << endl;
@@ -190,7 +190,7 @@ int main(int argc, char* argv[]){
         //vuelve al inicio del bucle de peticiones
     }
 
-
+    cout << "no deberia llegar aqui" << endl;
     return 0;
 
 
