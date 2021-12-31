@@ -5,7 +5,7 @@ FECHA = fecha
 SOCKET_DIR=Socket
 SOCKET=${SOCKET_DIR}/Socket
 EJEC = Analizadores
-
+CONTROL = Monitor
 
 CPPFLAGS=-I. -I${SOCKET_DIR} -O2 -std=c++11 -lsockets # Flags compilacion
 LDFLAGS=-pthread # Flags linkado threads
@@ -17,8 +17,8 @@ LDFLAGS=-pthread # Flags linkado threads
 # ANALIZADORES
 
 # Linkado
-${ANALIZADORES}: ${SOCKET}.o ${FECHA}.o ${ANALIZADORES}.o  
-	${CC} ${LDFLAGS} ${SOCKET}.o ${ANALIZADORES}.o -o ${EJEC} ${SOCKETSFLAGS}
+${ANALIZADORES}: ${SOCKET}.o ${FECHA}.o ${CONTROL}.o ${ANALIZADORES}.o  
+	${CC} ${LDFLAGS} ${SOCKET}.o ${CONTROL}.o ${ANALIZADORES}.o -o ${EJEC} ${SOCKETSFLAGS}
 # Compilacion
 ${ANALIZADORES}.o: ${ANALIZADORES}.cpp
 	${CC} -c ${CPPFLAGS} ${ANALIZADORES}.cpp
@@ -28,10 +28,12 @@ ${ANALIZADORES}.o: ${ANALIZADORES}.cpp
 # Compilacion libreria de Sockets
 ${SOCKET}.o: ${SOCKET}.hpp ${SOCKET}.cpp
 	${CC} -c ${CPPFLAGS} ${SOCKET}.cpp -o ${SOCKET}.o
-
+# MONITOR
+${CONTROL}.o: ${CONTROL}.cpp ${CONTROL}.hpp
+	${CC} -c ${CONTROL}.cpp -o ${CONTROL}.o ${CPPFLAGS}
 
 #-----------------------------------------------------------
 # LIMPIEZA
 clean:
-	$(RM) ${SOCKET}.o
+	$(RM) ${SOCKET}.o ${CONTROL}.o
 	$(RM) ${ANALIZADORES} ${ANALIZADORES}.o
