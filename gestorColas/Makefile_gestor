@@ -1,0 +1,61 @@
+#*****************************************************************
+# File:   Makefile_gestor
+# Author: Simón Alonso, Héctor Arcega
+# Date:   Diciembre 2021
+#*****************************************************************
+
+#---------------------------------------------------------
+CC=g++
+#---------------------------------------------------------
+SERVIDOR=gestorDeColas
+MONITOR = monitorColas
+#---------------------------------------------------------
+BOUND_DIR = BoundedQueue
+BOUND = ${BOUND_DIR}/BoundedQueue
+#---------------------------------------------------------
+SOCKET_DIR=Socket
+SOCKET=${SOCKET_DIR}/Socket
+#---------------------------------------------------------
+# directorio y clase para semaforos
+SEM_LIB=./librerias/Semaphore_V4
+SEMAPHORE=${SEM_LIB}/Semaphore_V4
+#---------------------------------------------------------
+CPPFLAGS=-I. -I${SOCKET_DIR} -I${BOUND_DIR} -I${SEM_LIB} -I${LIST_LIB} -O2 -std=c++11 -lsockets # Flags compilacion
+LDFLAGS=-pthread # Flags linkado threads
+SOCKETSFLAGS= -lsocket -lnsl #Descomentar esta linea para compilar en hendrix
+#---------------------------------------------------------
+
+all: ${SERVIDOR} 
+#-----------------------------------------------------------
+# SERVIDOR
+# Compilacion
+${SERVIDOR}.o: ${SERVIDOR}.cpp 
+	${CC} -c ${CPPFLAGS} ${SERVIDOR}.cpp
+
+# Linkado
+${SERVIDOR}: ${SOCKET}.o ${SEMAPHORE}.o ${MONITOR}.o ${SERVIDOR}.o
+	${CC} ${LDFLAGS} ${SOCKET}.o ${SEMAPHORE}.o ${MONITOR}.o ${SERVIDOR}.o -o ${SERVIDOR} ${SOCKETSFLAGS}
+#-----------------------------------------------------------
+# SOCKETS
+# Compilacion libreria de Sockets
+${SOCKET}.o: ${SOCKET}.hpp ${SOCKET}.cpp
+	${CC} -c ${CPPFLAGS} ${SOCKET}.cpp -o ${SOCKET}.o
+#-----------------------------------------------------------
+# BOUNDED QUEUE
+${BOUND}.o: ${BOUND}.hpp ${BOUND}.cpp
+	${CC} -c ${CPPFLAGS} ${BOUND}.cpp -o ${BOUND}.o
+#-----------------------------------------------------------
+# compilar
+${SEMAPHORE}.o: ${SEMAPHORE}.hpp ${SEMAPHORE}.cpp
+	${CC} -c ${SEMAPHORE}.cpp -o ${SEMAPHORE}.o ${CPPFLAGS}
+#---------------------------
+${MONITOR}.o: ${MONITOR}.hpp ${MONITOR}.cpp
+	${CC} -c ${MONITOR}.cpp -o ${MONITOR}.o  ${CPPFLAGS}
+#-----------------------------------------------------------
+# LIMPIEZA
+clean:
+	$(RM) ${SOCKET}.o
+	$(RM) ${BOUND}.o
+	$(RM) ${SEMAPHORE}.o
+	$(RM) ${MONITOR}.o
+	$(RM) ${SERVIDOR} ${SERVIDOR}.o
