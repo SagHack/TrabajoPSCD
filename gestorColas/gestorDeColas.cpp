@@ -46,7 +46,7 @@ void servworker(ControlColas& monitorTareas,ControlColas& monitorQos,ControlCola
     string tags = "";
     string qos = "";
     while(!end){
-        recv_bytes = socket_worker.Recv(client_worker_fd,solicitud,MESSAGE_SIZE); //Recibimos que es lo que quieren que hagamos
+        recv_bytes = socket_worker.Recv(client_worker_fd,solicitud,MESSAGE_SIZE); //Recibimos que es lo que quieren que hagamos, es decir, que si quieren que enviemos el contenido o lo recibamos. 
         if(recv_bytes == -1){
             cerr << "Error al recibir mensaje del Worker: " << strerror(errno) << endl;
             // Cerramos el socket
@@ -67,7 +67,7 @@ void servworker(ControlColas& monitorTareas,ControlColas& monitorQos,ControlCola
                 exit(1);
             }
         }
-        else if(solicitud == "RECIBIR"){//COMO PRIMERO NOS ENVIAN LOS TAGS Y LUEGO LOS QOS EN MENSAJES DISTINTOS PODEMOS HACER 2 RECV QUE PRIMERO RECIVA LOS TAGS Y LUEGO LOS QOS
+        else if(solicitud == "RECIBIR"){//COMO PRIMERO NOS ENVIAN LOS TAGS Y LUEGO LOS QOS EN MENSAJES DISTINTOS PODEMOS HACER 2 RECV QUE PRIMERO RECIBA LOS TAGS Y LUEGO LOS QOS
             recv_bytes = socket_worker.Recv(client_worker_fd,tags,MESSAGE_SIZE);/*Recibimos los tags*/
             if(recv_bytes == -1){
                 cerr << "Error al recibir datos de la cola Tareas: " << strerror(errno) << endl;
