@@ -90,12 +90,9 @@ struct tag{
     string usuario;
     Fecha fecha;
 };
+
 tag vectorTags[NUM_MAXIMOS];
-
-
-
-
-
+int cuentaTotal = 0, tiempoTotal = 0;
 
 
 void mostrarDatosTags(){
@@ -155,17 +152,22 @@ void mostrarDatosTags(){
         cout << "#" << i << ": " << auxvector2[i]  << " con " << auxvector1[i] << " veces utilizado" << endl; 
     }
     NumMostrados = NumMostradosSeguridad;
-
-
-
-    
-
 }
-/*
+
 void mostrarDatosQOS(){
+    int num = 0, tiempo = 0;
+    controlCont.entraQos();
+    num = cuentaTotal;
+    tiempo = tiempoTotal;
+    cuentaTotal = 0;
+    tiempoTotal = 0;
+    controlCont.saleQos();
+    cout << "-----------------------------------" << endl;
+    cout << "Se han extraido un total de: " << num << " tags, en tiempo total de: " << tiempo << " milisegundos." << endl;
+    cout << "Eso hace una media de " << num/tiempo << " tags por milisegundo." << endl;
     
 }
-*/
+
 void canalTags(const int puerto){
     string buffer;
     tag tagaux;
@@ -260,13 +262,10 @@ void canalTags(const int puerto){
             posTagsInicio = posFinTag;
             posFinTag = buffer.find(DELIMITADOR, posTagsInicio + 1);
         }
-        
-
-    
     }
-
-    
 }
+
+
 void canalQOS(const int puerto){
     string bufferQOS;
     Socket chanQOS(SERVER_ADDRESS, puerto);
@@ -298,19 +297,39 @@ void canalQOS(const int puerto){
         chanQOS.Close(socketQOS_fd);
     }
 
+    //nos pasan un string con los resultados de analizar un paquete de 5 tweets. Esta organizado de la siguiente manera:
+    //empieza por el numero de tags que habia en el tweet, el DELIMITADOR ";" , el tiempo que le ha costado encontrarlo,
+    // el DELIMITADOR ";" y el SEPARADOR "\n" entre los tweets
 
+    size_t inicio = 0;
+    for(unsigned int k = 0;k < TAMMANO_PAQUETES_REDUCIDOS; k++){
+        size_t posCuenta = bufferQOS.find(DELIMITADOR, inicio);
+        size_t posTiempo = bufferQOS.find(DELIMITADOR, posCuenta + 1);
+        size_t finTweet = bufferQOS.find(SEPARADOR, posTiempo + 1);
+
+        string cuenta = "", tiempo = "";
+        for(unsigned int i = posCuenta + 1; i < posTiempo - 1; i++){
+            cuenta += bufferQOS[i];
+        }
+        for(unsigned int i = posTiempo + 1; i < finTweet- 1; i++){
+            tiempo += bufferQOS[i];
+        }
+  
+        controlCont.entraQos();//entra en el monitor
+        cuentaTotal += atoi(cuenta.c_str());
+        tiempoTotal += atoi(tiempo.c_str());
+        controlCont.saleQos();//sale del monitor
+
+        inicio = bufferQOS.find(SEPARADOR);//para que la siguiente iteración busque el siguiente tweet
+    }
 }
+
 void cliente(){
-
-
     while(true){
         this_thread::sleep_for(chrono::seconds(20));
-
         mostrarDatosTags();
-        //mostrarDatosQos();
-        
+        mostrarDatosQOS();
     }
-
 }
 
 int main(int argc, char* argv[]){
