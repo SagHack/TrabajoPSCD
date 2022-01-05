@@ -12,6 +12,7 @@ using namespace std;
 const string SERVER_ADDRESS = "localhost";
 
 const string SEPARADOR="\n";
+const int LONG_25TWEETS=10000;
 
 void separarcadena(string buffer,const string SEPARADOR, string tweets[]){
     vector<string> words;
@@ -29,7 +30,7 @@ void separarcadena(string buffer,const string SEPARADOR, string tweets[]){
 }
 
 void streaming(Socket chanstreaming, string tweets[], string bloques[], int &error_code_streaming){
-  // ------------------------------CONEXIÓN CON STREAMING----------------------------------------------------
+// ------------------------------CONEXIÓN CON STREAMING----------------------------------------------------
   cout<<"entra"<<endl;
   const int MAX_ATTEMPS= 10;
   int count=0;
@@ -59,7 +60,7 @@ void streaming(Socket chanstreaming, string tweets[], string bloques[], int &err
     //Recibimos 25 tweets en un string (buffer)
     string buffer; 
 
-    int rcv_bytes = chanstreaming.Recv(socketstreaming_fd,buffer,sizeof(string));
+    int rcv_bytes = chanstreaming.Recv(socketstreaming_fd,buffer,LONG_25TWEETS);
     if (rcv_bytes == -1) {
         cerr << "Error al recibir datos: " + string(strerror(errno)) + "\n";
         // Cerramos los sockets
@@ -78,13 +79,12 @@ void streaming(Socket chanstreaming, string tweets[], string bloques[], int &err
   if (error_code_streaming == -1) {
       cerr << "Error cerrando el socket del master: " + string(strerror(errno)) + " aceptado" + "\n";
   }
-// --------------------------------------FIN DE CONEXION CON STREAMING--------------------------------------
 
 }
 
 void colas(Socket chancolas, string tweets[], string bloques[], int &error_code_colas){
   //---------------------------------------CONEXION CON GESTOR DE COLAS------------------------------------
-
+  
   const int MAX_ATTEMPS= 10;
   int count=0;
   int socketcolas_fd;
