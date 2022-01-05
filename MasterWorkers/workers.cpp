@@ -155,19 +155,20 @@ int main(int argc, char *argv[]){
     string tweets[5]={}; 
     string tags[5]={};
     string qos[5]={};
-     do{
-        //conexión con el servidor
-        socketworker_fd=chancolas.Connect();
-        count++;
-
-        //Si error -> esperamos 1 segundo para reconectar
-        if(socketworker_fd==-1){
-            this_thread::sleep_for(chrono::seconds(1));
-        }
-    }while(socketworker_fd==-1 && count<MAX_ATTEMPS);
 
     for (int i=0; i<N_WORKERS; i++) {
+        count =0;
+        do{
+            //conexión con el servidor
+            socketworker_fd=chancolas.Connect();
+            count++;
 
+            //Si error -> esperamos 1 segundo para reconectar
+            if(socketworker_fd==-1){
+                this_thread::sleep_for(chrono::seconds(1));
+            }
+        }while(socketworker_fd==-1 && count<MAX_ATTEMPS);
+        
         W[i] = thread(&worker,tags,qos,socketworker_fd,chancolas,ref(tiempo));
         cout << "Nuevo worker " + to_string(i) + " aceptado" + "\n";
     }
