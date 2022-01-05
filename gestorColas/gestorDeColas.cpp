@@ -162,7 +162,7 @@ void servtags(ControlColas& monitorTags,Socket socket_tags,int client_tags_fd){
 
 
 using namespace std;
-const int N_WORKER = 20;
+const int N_WORKER = 5;
 int main(int argc,char* argv[]) {
     //Puertos: 1)Master 2)Worker 3)QoS 4)Tags
     int puerto_master = atoi(argv[1]);
