@@ -4,37 +4,19 @@
 
 
 Control::Control() { //constructor
-    puedoEntrarTags = true;
-    puedoEntrarQos = true;
+    puedoEntrar = true;
 };
 
-
-void Control::entraTags(){
+void Control::entra(){
     unique_lock<mutex> lck(mtxMonitor);
-    while(!puedoEntrarTags){
-        esperandoTags.wait(lck);
+    while(!puedoEntrar){
+        esperando.wait(lck);
     }
-    puedoEntrarTags = false;
+    puedoEntrar = false;
 };
 
-
-void Control::saleTags(){  
+void Control::sale(){  
     unique_lock<mutex> lck(mtxMonitor);
-    puedoEntrarTags = true;
-    esperandoTags.notify_one();  //avisa a uno de que se va
-};
-
-void Control::entraQos(){
-    unique_lock<mutex> lck(mtxMonitor);
-    while(!puedoEntrarQos){
-        esperandoQos.wait(lck);
-    }
-    puedoEntrarQos = false;
-};
-
-
-void Control::saleQos(){  
-    unique_lock<mutex> lck(mtxMonitor);
-    puedoEntrarQos = true;
-    esperandoQos.notify_one();  //avisa a uno de que se va
+    puedoEntrar = true;
+    esperando.notify_one();  //avisa a uno de que se va
 };
