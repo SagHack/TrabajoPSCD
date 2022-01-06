@@ -13,7 +13,7 @@ const string SEPARADOR = "\n";
 int NumMostrados;
 int coordenadasUsadasTAGS;
 const int length = 1000;
-Control controlCont;
+Control controlTags,controlQos;
 
 struct Fecha{
 
@@ -103,7 +103,7 @@ void mostrarDatosTags(){
     for(unsigned int i = 0; i < NumMostrados; i++){
         tagaux[i].num_veces = 0;
     }
-    controlCont.entraTags();//pide permiso para entrar en el semáforo
+    controlTags.entra();//pide permiso para entrar en el monitor
     for(unsigned int i = 0; i < coordenadasUsadasTAGS; i++){
 
 
@@ -122,7 +122,7 @@ void mostrarDatosTags(){
         }
     }
     coordenadasUsadasTAGS = 0;
-    controlCont.saleTags();// sale del semáforo
+    controlTags.sale();// sale del monitor
 
     cout << "-----------------------------------" << endl;
     cout << "Los " << NumMostrados << " tags mas utilizados han sido:" << endl;
@@ -156,12 +156,12 @@ void mostrarDatosTags(){
 
 void mostrarDatosQOS(){
     int num = 0, tiempo = 0;
-    controlCont.entraQos();
+    controlQos.entra();
     num = cuentaTotal;
     tiempo = tiempoTotal;
     cuentaTotal = 0;
     tiempoTotal = 0;
-    controlCont.saleQos();
+    controlQos.sale();
     cout << "-----------------------------------" << endl;
     cout << "Se han extraido un total de: " << num << " tags, en tiempo total de: " << tiempo << " milisegundos." << endl;
     cout << "Eso hace una media de " << num/tiempo << " tags por milisegundo." << endl;
@@ -246,7 +246,7 @@ void canalTags(const int puerto){
                 tagaux.nombre += buffer[i];
             }
             tagaux.fecha = Fechaaux;
-            controlCont.entraTags();// pide permiso para entrar al semáforo
+            controlTags.entra();// pide permiso para entrar al monitor
             for(unsigned int j = 0; j < coordenadasUsadasTAGS + 1; j++){
                 if(tagaux.nombre == vectorTags[j].nombre){
                     vectorTags[j].num_veces++;
@@ -258,7 +258,7 @@ void canalTags(const int puerto){
                 vectorTags[coordenadasUsadasTAGS] = tagaux; 
                 coordenadasUsadasTAGS++;
             }
-            controlCont.saleTags();// sale del semáforo
+            controlTags.sale();// sale del monitor
             posTagsInicio = posFinTag;
             posFinTag = buffer.find(DELIMITADOR, posTagsInicio + 1);
         }
@@ -315,10 +315,10 @@ void canalQOS(const int puerto){
             tiempo += bufferQOS[i];
         }
   
-        controlCont.entraQos();//entra en el monitor
+        controlQos.entra();//entra en el monitor
         cuentaTotal += atoi(cuenta.c_str());
         tiempoTotal += atoi(tiempo.c_str());
-        controlCont.saleQos();//sale del monitor
+        controlQos.sale();//sale del monitor
 
         inicio = bufferQOS.find(SEPARADOR);//para que la siguiente iteración busque el siguiente tweet
     }
