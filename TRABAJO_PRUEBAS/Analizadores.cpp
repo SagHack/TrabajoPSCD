@@ -12,7 +12,7 @@ const string SEPARADOR = "\n";
 int NumMostrados;
 int coordenadasUsadasTAGS;
 const int length = 1000;
-Control controlTags,controlQos;
+Control controlCont;
 
 struct Fecha{
 
@@ -102,7 +102,7 @@ void mostrarDatosTags(){
     for(unsigned int i = 0; i < NumMostrados; i++){
         tagaux[i].num_veces = 0;
     }
-    controlTags.entra();//pide permiso para entrar en el monitor
+    controlCont.entraTags();//pide permiso para entrar en el semáforo
     for(unsigned int i = 0; i < coordenadasUsadasTAGS; i++){
 
 
@@ -121,7 +121,7 @@ void mostrarDatosTags(){
         }
     }
     coordenadasUsadasTAGS = 0;
-    controlTags.sale();// sale del monitor
+    controlCont.saleTags();// sale del semáforo
 
     cout << "-----------------------------------" << endl;
     cout << "Los " << NumMostrados << " tags mas utilizados han sido:" << endl;
@@ -155,12 +155,12 @@ void mostrarDatosTags(){
 
 void mostrarDatosQOS(){
     int num = 0, tiempo = 0;
-    controlQos.entra();
+    controlCont.entraQos();
     num = cuentaTotal;
     tiempo = tiempoTotal;
     cuentaTotal = 0;
     tiempoTotal = 0;
-    controlQos.sale();
+    controlCont.saleQos();
     cout << "-----------------------------------" << endl;
     cout << "Se han extraido un total de: " << num << " tags, en tiempo total de: " << tiempo << " milisegundos." << endl;
     cout << "Eso hace una media de " << num/tiempo << " tags por milisegundo." << endl;
@@ -190,7 +190,17 @@ void canalTags(const int puerto){
     if(socketTags_fd == -1) {
         exit(1);
     }
+    //Enviamos la peticion
 
+    int send_bytes = chanTags.Send(socketTags_fd,"PETICION");
+    if(send_bytes == -1) {
+        cerr << "Error al enviar datos: " + string(strerror(errno)) + "\n";
+        // Cerramos los sockets
+        chanTags.Close(socketTags_fd);
+        exit(1);
+    }
+
+    cout << "Peticion enviada al Streaming"<<endl;
     int rcv_bytes = chanTags.Recv(socketTags_fd, buffer, length);
     if(rcv_bytes == -1) {
         string mensError(strerror(errno));
@@ -245,7 +255,7 @@ void canalTags(const int puerto){
                 tagaux.nombre += buffer[i];
             }
             tagaux.fecha = Fechaaux;
-            controlTags.entra();// pide permiso para entrar al monitor
+            controlCont.entraTags();// pide permiso para entrar al semáforo
             for(unsigned int j = 0; j < coordenadasUsadasTAGS + 1; j++){
                 if(tagaux.nombre == vectorTags[j].nombre){
                     vectorTags[j].num_veces++;
@@ -257,7 +267,7 @@ void canalTags(const int puerto){
                 vectorTags[coordenadasUsadasTAGS] = tagaux; 
                 coordenadasUsadasTAGS++;
             }
-            controlTags.sale();// sale del monitor
+            controlCont.saleTags();// sale del semáforo
             posTagsInicio = posFinTag;
             posFinTag = buffer.find(DELIMITADOR, posTagsInicio + 1);
         }
@@ -287,7 +297,16 @@ void canalQOS(const int puerto){
     if(socketQOS_fd == -1) {
         exit(1);
     }
+    //Mandamos peticion
+    int send_bytes = chanQOS.Send(socketQOS_fd,"PETICION");
+    if(send_bytes == -1) {
+        cerr << "Error al enviar datos: " + string(strerror(errno)) + "\n";
+        // Cerramos los sockets
+        chanQOS.Close(socketQOS_fd);
+        exit(1);
+    }
 
+    
     int rcv_bytes = chanQOS.Recv(socketQOS_fd, bufferQOS, length);
     if(rcv_bytes == -1) {
         string mensError(strerror(errno));
@@ -314,10 +333,11 @@ void canalQOS(const int puerto){
             tiempo += bufferQOS[i];
         }
   
-        controlQos.entra();//entra en el monitor
+        controlCont.entraQos();//entra en el monitor
         cuentaTotal += atoi(cuenta.c_str());
         tiempoTotal += atoi(tiempo.c_str());
-        controlQos.sale();//sale del monitor
+        controlCont.saleQos();//sale del monitor
+
         inicio = bufferQOS.find(SEPARADOR);//para que la siguiente iteración busque el siguiente tweet
     }
 }
