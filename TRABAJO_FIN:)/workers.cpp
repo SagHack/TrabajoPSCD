@@ -111,7 +111,7 @@ void worker(int socketworker_fd, Socket chancolas){
         }
         separarcadena(bloque,SEPARADOR,tweets);
         end=chrono::steady_clock::now();
-        tiempo+=chrono::duration_cast<chrono::microseconds>(end-start).count();
+        tiempo=chrono::duration_cast<chrono::microseconds>(end-start).count();
         //cout<<"tiempo actualizado"<<endl;
 
         for(unsigned int i=0;i<5;i++){
