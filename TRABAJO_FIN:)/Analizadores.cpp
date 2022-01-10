@@ -1,6 +1,8 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <vector>
+#include <fstream>
 #include "Socket/Socket.hpp"
 #include "Monitor.hpp"
 
@@ -10,8 +12,6 @@ const int TAMMANO_PAQUETES_REDUCIDOS = 5;
 const string DELIMITADOR = ";";
 const string SEPARADOR = "\n";
 int NumMostrados;
-int coordenadasUsadasTAGS;
-int coordenadasUsadasQOS;
 const int length = 10000;
 Control controlCont;
 
@@ -24,47 +24,22 @@ struct Fecha{
 
 };
 
+    void igualar(Fecha& f, Fecha& g){
+        f.elAnyo = g.elAnyo;
+        f.elMes = g.elMes;
+        f.elDia = g.elDia;
+        f.laHora = g.laHora;
+    };
 
-   bool esBisiesto(int a) {
-     return (a % 4 == 0 && !(a % 100 == 0 && a % 400 != 0));
-   }
+   void crear(int dia, int mes, int anyo, int hora, Fecha& f) {
 
-
-
-  bool esFechaValida(int d, int m, int a) {
-     bool valida = 1583 <= a && 1 <= m && m <= 12;
-     if (valida) {
-       switch (m) {
-         case 4: case 6: case 9: case 11: 
-           valida = 1 <= d && d <= 30; 
-           break;
-         case 1: case 3: case 5: case 7: case 8: case 10: case 12:
-           valida = 1 <= d && d <= 31;
-           break;
-         case 2: 
-           if (!esBisiesto(a)) {
-             valida = 1 <= d && d <= 28;
-           }
-           else
-             valida = 1 <= d && d <= 29;
-           break;
-       }         
-     }
-     return valida;
-   }
-
-
-
-   void crear(int dia, int mes, int anyo, int hora, Fecha& f, bool& error) {
-     if (esFechaValida(dia, mes, anyo)) {
        f.elDia = dia;
        f.elMes = mes;
        f.elAnyo = anyo;
        f.laHora = hora;
-       error = false;
-     }
-     else
-       error = true;
+
+     
+
    };
 
     int dia(const Fecha& f) {
@@ -90,11 +65,15 @@ struct tag{
     Fecha fecha;
 };
 
-tag vectorTags[NUM_MAXIMOS];
-int vectorQos[NUM_MAXIMOS];
+std::vector<tag> vectorTags;
+
+//tag vectorTags[NUM_MAXIMOS];
+int cuentaTotal = 0, tiempoTotal = 0;
 
 
 void mostrarDatosTags(){
+    ofstream g;
+    g.open("AnalisisTAGs.txt");
 
     tag tagaux[NumMostrados];
     int vectorHoras[24] = {0};
@@ -104,7 +83,7 @@ void mostrarDatosTags(){
         tagaux[i].num_veces = 0;
     }
     controlCont.entraTags();//pide permiso para entrar en el semáforo
-    for(unsigned int i = 0; i < coordenadasUsadasTAGS; i++){
+    for(unsigned int i = 0; i < vectorTags.size(); i++){
 
 
         vectorHoras[hora(vectorTags[i].fecha)/1000]++; //esta aberracion va contando los tweets y sus horas
@@ -145,13 +124,15 @@ void mostrarDatosTags(){
             } 
        }
     }
-    coordenadasUsadasTAGS = 0;
     controlCont.saleTags();// sale del semáforo
 
     cout << "-----------------------------------" << endl;
+    g << "-----------------------------------" << endl;
     cout << "Los " << NumMostrados << " tags mas utilizados han sido:" << endl;
+    g << "Los " << NumMostrados << " tags mas utilizados han sido:" << endl;
     for(unsigned int i = 0; i< NumMostrados; i++){
         cout << "#" << i + 1 << ": " << tagaux[i].nombre << " con " << tagaux[i].num_veces << " veces utilizado" << endl; 
+        g << "#" << i + 1 << ": " << tagaux[i].nombre << " con " << tagaux[i].num_veces << " veces utilizado" << endl; 
     }
     int NumMostradosSeguridad = NumMostrados;
 
@@ -175,31 +156,32 @@ void mostrarDatosTags(){
     }
 
     cout << "-----------------------------------" << endl;
+    g << "-----------------------------------" << endl;
     cout << "Las " << NumMostrados << " horas en las que mas tags se han usado son:" << endl;
+    g << "Las " << NumMostrados << " horas en las que mas tags se han usado son:" << endl;
     for(unsigned int i = 0; i < NumMostrados; i++){
-        cout << "#" << i << ": " << auxvector2[i]  << " con " << auxvector1[i] << " veces utilizado" << endl; 
+        cout << "#" << i + 1 << ": " << auxvector2[i]  << " con " << auxvector1[i] << " veces utilizado" << endl; 
+        g << "#" << i + 1 << ": " << auxvector2[i]  << " con " << auxvector1[i] << " veces utilizado" << endl; 
     }
     NumMostrados = NumMostradosSeguridad;
 }
 
 void mostrarDatosQOS(){
-    int num = 0, tiempo = 0;
-    unsigned int i = 0;
+    ofstream g;
+    g.open("AnalisisQOS.txt");
     controlCont.entraQos();
-    while(i < coordenadasUsadasQOS){
-        num += vectorQos[i];
-        tiempo += vectorQos[i+1];
-        i += 2;      
-    }
-    coordenadasUsadasQOS = 0;
     controlCont.saleQos();
     cout << "-----------------------------------" << endl;
-    cout << "Se han extraido un total de: " << num << " tags, en tiempo total de: " << tiempo/1000 << " milisegundos." << endl;
-    cout << "Eso hace una media de " << num/(tiempo/1000) << " tags por milisegundo." << endl;
+    g << "-----------------------------------" << endl;
+    cout << "Se han extraido un total de: " << cuentaTotal << " tags, en tiempo total de: " << tiempoTotal/1000 << " milisegundos." << endl;
+    g << "Se han extraido un total de: " << cuentaTotal << " tags, en tiempo total de: " << tiempoTotal/1000 << " milisegundos." << endl;
+    cout << "Eso hace una media de " << cuentaTotal/(tiempoTotal/1000) << " tags por milisegundo." << endl;
+    g << "Eso hace una media de " << cuentaTotal/(tiempoTotal/1000) << " tags por milisegundo." << endl;
+
     
 }
 
-void canalTags(const int puerto){
+void canalTags(const int &puerto){
     string buffer;
     tag tagaux;
     Socket chanTags(SERVER_ADDRESS, puerto);
@@ -224,6 +206,7 @@ void canalTags(const int puerto){
     }
     //Enviamos la peticion
     int send_bytes, rcv_bytes;
+
     while(1){
         buffer = "";
         //cout << "Envio peticion de Tags" << endl;
@@ -269,7 +252,7 @@ void canalTags(const int puerto){
             string diaaux = "";
             string horaaux = "";
             Fecha Fechaaux;
-            bool boolaux;
+   
             
             
             for(unsigned int i = posFechaInicio + 1; i < posMesInicio - 1; i++){
@@ -288,7 +271,7 @@ void canalTags(const int puerto){
                 }
                 
             }
-            crear(stoi(anyoaux), stoi(mesaux), stoi(diaaux), stoi(horaaux), Fechaaux, boolaux); //con esto tenemos las fechas creadas.
+            crear(stoi(anyoaux), stoi(mesaux), stoi(diaaux), stoi(horaaux), Fechaaux); //con esto tenemos las fechas creadas.
             posSEPARDAOR = buffer.find(SEPARADOR);
 
             size_t posFinTag = buffer.find(DELIMITADOR, posTagsInicio + 1);
@@ -301,16 +284,19 @@ void canalTags(const int puerto){
                 }
                 tagaux.fecha = Fechaaux;
                 controlCont.entraTags();// pide permiso para entrar al semáforo
-                for(unsigned int j = 0; j < coordenadasUsadasTAGS + 1; j++){
+                for(unsigned int j = 0; j < vectorTags.size(); j++){
                     if(tagaux.nombre == vectorTags[j].nombre){
                         vectorTags[j].num_veces++;
                         yaestaba = true;
-                        j = coordenadasUsadasTAGS;
+                        j = vectorTags.size();
                     }
                 }
                 if(!yaestaba){
-                    vectorTags[coordenadasUsadasTAGS] = tagaux; 
-                    coordenadasUsadasTAGS++;
+                    vectorTags.resize(vectorTags.size()+1);
+                    vectorTags[vectorTags.size() -1].nombre = tagaux.nombre; 
+                    vectorTags[vectorTags.size() -1].num_veces = 1; 
+                    igualar(vectorTags[vectorTags.size() -1 ].fecha, tagaux.fecha); 
+
                 }
                 controlCont.saleTags();// sale del semáforo
                 posTagsInicio = posFinTag;
@@ -323,7 +309,7 @@ void canalTags(const int puerto){
 }
 
 
-void canalQOS(const int puerto){
+void canalQOS(const int &puerto){
     string bufferQOS;
     Socket chanQOS(SERVER_ADDRESS, puerto);
     // Conectamos con el servidor. Probamos varias conexiones
@@ -346,7 +332,6 @@ void canalQOS(const int puerto){
         exit(1);
     }
     int send_bytes, rcv_bytes;
-    int cuentaTotal = 0, tiempoTotal = 0;
     //Mandamos peticion
     while(1){
         bufferQOS = "";
@@ -379,8 +364,6 @@ void canalQOS(const int puerto){
 
             //cout << bufferQOS << endl;
             if(k==0){
-                cuentaTotal = 0;
-                tiempoTotal = 0;
                 posCuenta = 0;
             }
             else{
@@ -404,10 +387,8 @@ void canalQOS(const int puerto){
             //cout << endl;
             controlCont.entraQos();//entra en el monitor
             //cout << tiempo << endl;
-            //en el vector estan el numero de Tags en las componentes pares y en las impares el tiempo
-            vectorQos[coordenadasUsadasQOS] = atoi(cuenta.c_str());;
-            vectorQos[coordenadasUsadasQOS + 1] = atoi(tiempo.c_str());
-            coordenadasUsadasQOS += 2;
+            cuentaTotal += atoi(cuenta.c_str());
+            tiempoTotal += atoi(tiempo.c_str());
             controlCont.saleQos();//sale del monitor
 
             inicio = bufferQOS.find(SEPARADOR);//para que la siguiente iteración busque el siguiente tweet
@@ -418,6 +399,8 @@ void canalQOS(const int puerto){
 void cliente(){
     while(true){
         this_thread::sleep_for(chrono::seconds(5));
+        cout << "aqui" << endl;
+
         //cout << "se va a escibir por pantalla " << endl;
         mostrarDatosTags();
         mostrarDatosQOS();
@@ -425,15 +408,16 @@ void cliente(){
 }
 
 int main(int argc, char* argv[]){
+
+
+    
     cout << "se inician los analizadores" << endl;
-    coordenadasUsadasTAGS = 0;
-    coordenadasUsadasQOS = 0;
     int PUERTO_ANALIZADORES_TAGS = atoi(argv[2]);
     int PUERTO_ANALIZADORES_QOS = atoi(argv[1]);
     NumMostrados = atoi(argv[3]);
     thread threadcliente(&cliente);
-    thread channelTAGS(&canalTags, PUERTO_ANALIZADORES_TAGS);
-    thread channelQOS(&canalQOS, PUERTO_ANALIZADORES_QOS);
+    thread channelTAGS(&canalTags, ref(PUERTO_ANALIZADORES_TAGS));
+    thread channelQOS(&canalQOS, ref(PUERTO_ANALIZADORES_QOS));
     threadcliente.join();
     channelQOS.join();
     channelTAGS.join();
