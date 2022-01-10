@@ -11,6 +11,7 @@ const string DELIMITADOR = ";";
 const string SEPARADOR = "\n";
 int NumMostrados;
 int coordenadasUsadasTAGS;
+int coordenadasUsadasQOS;
 const int length = 10000;
 Control controlCont;
 
@@ -90,7 +91,7 @@ struct tag{
 };
 
 tag vectorTags[NUM_MAXIMOS];
-int cuentaTotal = 0, tiempoTotal = 0;
+int vectorQos[NUM_MAXIMOS];
 
 
 void mostrarDatosTags(){
@@ -183,11 +184,14 @@ void mostrarDatosTags(){
 
 void mostrarDatosQOS(){
     int num = 0, tiempo = 0;
+    unsigned int i = 0;
     controlCont.entraQos();
-    num = cuentaTotal;
-    tiempo = tiempoTotal;
-    cuentaTotal = 0;
-    tiempoTotal = 0;
+    while(i < coordenadasUsadasQOS){
+        num += vectorQos[i];
+        tiempo += vectorQos[i+1];
+        i += 2;      
+    }
+    coordenadasUsadasQOS = 0;
     controlCont.saleQos();
     cout << "-----------------------------------" << endl;
     cout << "Se han extraido un total de: " << num << " tags, en tiempo total de: " << tiempo/1000 << " milisegundos." << endl;
@@ -220,7 +224,6 @@ void canalTags(const int puerto){
     }
     //Enviamos la peticion
     int send_bytes, rcv_bytes;
-
     while(1){
         buffer = "";
         //cout << "Envio peticion de Tags" << endl;
@@ -343,6 +346,7 @@ void canalQOS(const int puerto){
         exit(1);
     }
     int send_bytes, rcv_bytes;
+    int cuentaTotal = 0, tiempoTotal = 0;
     //Mandamos peticion
     while(1){
         bufferQOS = "";
@@ -375,6 +379,8 @@ void canalQOS(const int puerto){
 
             //cout << bufferQOS << endl;
             if(k==0){
+                cuentaTotal = 0;
+                tiempoTotal = 0;
                 posCuenta = 0;
             }
             else{
@@ -398,8 +404,10 @@ void canalQOS(const int puerto){
             //cout << endl;
             controlCont.entraQos();//entra en el monitor
             //cout << tiempo << endl;
-            cuentaTotal += atoi(cuenta.c_str());
-            tiempoTotal += atoi(tiempo.c_str());
+            //en el vector estan el numero de Tags en las componentes pares y en las impares el tiempo
+            vectorQos[coordenadasUsadasQOS] = atoi(cuenta.c_str());;
+            vectorQos[coordenadasUsadasQOS + 1] = atoi(tiempo.c_str());
+            coordenadasUsadasQOS += 2;
             controlCont.saleQos();//sale del monitor
 
             inicio = bufferQOS.find(SEPARADOR);//para que la siguiente iteración busque el siguiente tweet
@@ -419,6 +427,7 @@ void cliente(){
 int main(int argc, char* argv[]){
     cout << "se inician los analizadores" << endl;
     coordenadasUsadasTAGS = 0;
+    coordenadasUsadasQOS = 0;
     int PUERTO_ANALIZADORES_TAGS = atoi(argv[2]);
     int PUERTO_ANALIZADORES_QOS = atoi(argv[1]);
     NumMostrados = atoi(argv[3]);
