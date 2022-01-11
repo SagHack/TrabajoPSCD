@@ -1,7 +1,6 @@
 Comandos para compilar
 
-
-//hendrix01.cps.unizar.es -> 155.210.152.183
+//pilgor.cps.unizar.es -> 155.210.152.12
 make -f Makefile_Streaming clean
 make -f Makefile_Streaming
 
@@ -13,7 +12,7 @@ make -f Makefile_gestor
 make -f Makefile_Analizadores clean
 make -f Makefile_Analizadores
 
-//pilgor.cps.unizar.es -> 155.210.152.12
+//hendrix01.cps.unizar.es -> 155.210.152.183
 make -f Makefile_MW clean
 make -f Makefile_MW
 
@@ -46,7 +45,7 @@ make -f Makefile_MW
 ./Analizadores 3003 3004 10 155.210.152.177
 
 // streaming-master, colas-master ServerAdressStreaming ServerAdressColas
-./master 3000 3001 155.210.152.183 155.210.152.177
+./master 3000 3001 155.210.152.12 155.210.152.177
 
 //colas-worker ServerAdressColas
 ./workers 3002 155.210.152.177
