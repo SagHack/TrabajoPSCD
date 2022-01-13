@@ -200,6 +200,9 @@ void servtags(ControlColas& monitorTags,Socket socket_tags,int client_tags_fd){
     //ControlColas MONITORTAREAS    //ControlColas MONITORQOS   //ControlColas MONITORTAGS
 
 int main(int argc,char* argv[]) {
+    if (argc != 6){
+        cout<<"Ejecutar como puerto_master puerto_worker puerto_qos puerto_tags N_WORKER"<<endl;
+    }
     int N_WORKER = 5;
     //Puertos: 1)Master 2)Worker 3)QoS 4)Tags 
     int puerto_master = atoi(argv[1]);
