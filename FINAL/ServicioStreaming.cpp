@@ -59,15 +59,11 @@ int main(int argc, char* argv[]){
     string fechaaux;
     string aplicacion;
     string autor;
-    string tweetaux;
     string buffer;
     int length = 1000;
     bool vaBien;
-    char charaux;
-    char charaux2;
-    string chariso;
-    int send_bytes;
-    int rcv_bytes;
+    char charaux,charaux2;
+    int send_bytes,rcv_bytes;
     string mensaje;
     f.open(nombrefichero);
     getline(f,basura);
