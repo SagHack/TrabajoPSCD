@@ -19,7 +19,7 @@ make -f Makefile_Analizadores
 
 --------------------------------------------------------------------------------
 //Puerto streaming-master 
-./ServicioStreaming 32000
+./ServicioStreaming 32055
 --------------------------------------------------------------------------------
 // Puerto con el master,worker,qos,tags, N_WORKERS
 ./gestorDeColas 32011 32022 32033 32044 5
@@ -28,7 +28,7 @@ make -f Makefile_Analizadores
 ./Analizadores 32033 32044 10 155.210.152.177
 --------------------------------------------------------------------------------
 // streaming-master, colas-master ServerAdressStreaming ServerAdressColas
-./master 32000 32011 155.210.152.184 155.210.152.177
+./master 32055 32011 155.210.152.184 155.210.152.177
 --------------------------------------------------------------------------------
 //colas-worker N_WORKERS ServerAdressColas
 ./workers 32022 5 155.210.152.177
