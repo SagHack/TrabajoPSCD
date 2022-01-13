@@ -22,6 +22,6 @@ class ControlColas{
         BoundedQueue<string> cola = BoundedQueue<string>(TAM);
         condition_variable esperandoPublish, esperandoRead;
     public:
-        void publish(string& cadena);
+        void publish(string cadena);
         void read(string& cadena);
 };
