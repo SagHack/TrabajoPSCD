@@ -11,7 +11,7 @@
 #include "monitorColas.hpp"
 
 
-void ControlColas::publish(string& cadena){/*Añadir en la cola */ //cadena = bloque_twets
+void ControlColas::publish(string cadena){/*Añadir en la cola */ //cadena = bloque_twets
     unique_lock<mutex> lck(mtx);
     while(cola.length() >= cola.size()){ //Si esta llena, bloqueamos para que no pueda añadir
         esperandoPublish.wait(lck);
