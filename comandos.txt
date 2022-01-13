@@ -38,8 +38,8 @@ make -f Makefile_MW
 ./ServicioStreaming 3000
 
 
-// Puerto con el master,worker,qos,tags
-./gestorDeColas 3001 3002 3003 3004
+// Puerto con el master,worker,qos,tags, nWorkers
+./gestorDeColas 3001 3002 3003 3004 5
 
 //colas-QOS, colas-tags, numeroMostrados ServerAdressColas
 ./Analizadores 3003 3004 10 155.210.152.177
