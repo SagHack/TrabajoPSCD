@@ -37,3 +37,6 @@ make -f Makefile_Analizadores
 
 //Puertos que podemos usar
 32050 32051 32052 32053 32054 32055
+
+//gestorDeColas -> lab000 
+//Streaming -> hendrix02
