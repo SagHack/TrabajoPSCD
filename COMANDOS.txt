@@ -38,5 +38,7 @@ make -f Makefile_MW
 //Puertos que podemos usar
 32050 32051 32052 32053 32054 32055
 
-//gestorDeColas -> lab000 
+//Analizadores -> hendrix01
 //Streaming -> hendrix02
+//gestorDeColas -> lab000 
+//MasterWorker -> central
