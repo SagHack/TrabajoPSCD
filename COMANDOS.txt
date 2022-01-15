@@ -1,9 +1,8 @@
 Comandos para compilar
 
-
 //hendrix01.cps.unizar.es -> 155.210.152.183
-make -f Makefile_MW clean
-make -f Makefile_MW
+make -f Makefile_Analizadores clean
+make -f Makefile_Analizadores
 
 //hendrix02.cps.unizar.es -> 155.210.152.184
 make -f Makefile_Streaming clean
@@ -14,8 +13,9 @@ make -f Makefile_gestor clean
 make -f Makefile_gestor 
 
 //central.cps.unizar.es -> 155.210.154.100
-make -f Makefile_Analizadores clean
-make -f Makefile_Analizadores
+make -f Makefile_MW clean
+make -f Makefile_MW
+
 
 --------------------------------------------------------------------------------
 //Puerto streaming-master 
