@@ -59,7 +59,7 @@ void servmaster(ControlColas& monitorTareas,Socket socket_master,int client_mast
             bloque += tweet;
             contador++;
             if(contador == 5){
-	        cout << "Bloque recibido del master\n";
+				        cout << "Bloque recibido del master\n";
                 monitorTareas.publish(bloque); //Encolando el bloque de tweets en la cola Tareas
                 contador = 0;
                 bloque = "";
@@ -105,7 +105,7 @@ void servworker(ControlColas& monitorTareas,ControlColas& monitorQos,ControlCola
                 }
                 tweets[i] = "";
             }
-	    cout << "Bloque enviado al worker\n";
+			      cout << "Bloque enviado al worker\n";
             bloque = "";
             
         }
@@ -127,7 +127,7 @@ void servworker(ControlColas& monitorTareas,ControlColas& monitorQos,ControlCola
                 socket_worker.Close(client_worker_fd);
                 exit(1);
             }
-            cout << "Qos recibidas del worker\n";
+			      cout << "Qos recibidas del worker\n";
             monitorQos.publish(qos);/*Encolamos los qos en la cola qos*/
         }
     }
@@ -162,7 +162,7 @@ void servqos(ControlColas& monitorQos,Socket socket_qos,int client_qos_fd){
                 socket_qos.Close(client_qos_fd);
                 exit(1);
             }
-	    cout << "Qos enviadas\n";
+			      cout << "Qos enviadas\n";
         }
     }
 }
@@ -188,6 +188,7 @@ void servtags(ControlColas& monitorTags,Socket socket_tags,int client_tags_fd){
         }
         else if(solicitud == "PETICION"){
             monitorTags.read(tags);
+            //cout << tags << endl;
             send_bytes = socket_tags.Send(client_tags_fd, tags);
             if(send_bytes == -1){
                 cerr << "Error al enviar datos de la cola Tags: " << strerror(errno) << endl;
@@ -195,7 +196,7 @@ void servtags(ControlColas& monitorTags,Socket socket_tags,int client_tags_fd){
                 socket_tags.Close(client_tags_fd);
                 exit(1);
             }
-	    cout << "Tags enviadas\n";
+			      cout << "Tags enviadas\n";
         }
     }
 }
