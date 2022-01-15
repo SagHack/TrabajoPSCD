@@ -16,7 +16,7 @@ make -f Makefile_gestor
 if [ ! -e gestorDeColas ]
 then
  
-	echo "No existe el ejecutable de los Analizadores"
+	echo "No existe el ejecutable del gestor"
 	exit
 fi
 
