@@ -59,6 +59,7 @@ void servmaster(ControlColas& monitorTareas,Socket socket_master,int client_mast
             bloque += tweet;
             contador++;
             if(contador == 5){
+				cout << "Bloque recibido del master" <<endl;
                 monitorTareas.publish(bloque); //Encolando el bloque de tweets en la cola Tareas
                 contador = 0;
                 bloque = "";
@@ -104,6 +105,7 @@ void servworker(ControlColas& monitorTareas,ControlColas& monitorQos,ControlCola
                 }
                 tweets[i] = "";
             }
+			cout << "Bloque enviado al worker" <<endl;
             bloque = "";
             
         }
@@ -115,6 +117,7 @@ void servworker(ControlColas& monitorTareas,ControlColas& monitorQos,ControlCola
                 socket_worker.Close(client_worker_fd);
                 exit(1);
             }
+			cout << "Tags recibidas del worker" << endl;
             monitorTags.publish(tags);/*Encolamos las tags en la cola Tags*/
 
             recv_bytes = socket_worker.Recv(client_worker_fd,qos,MESSAGE_SIZE); /*Recibimos los qos*/
@@ -124,6 +127,7 @@ void servworker(ControlColas& monitorTareas,ControlColas& monitorQos,ControlCola
                 socket_worker.Close(client_worker_fd);
                 exit(1);
             }
+			cout << "Qos recibidas del worker" << endl;
             monitorQos.publish(qos);/*Encolamos los qos en la cola qos*/
         }
     }
@@ -158,6 +162,7 @@ void servqos(ControlColas& monitorQos,Socket socket_qos,int client_qos_fd){
                 socket_qos.Close(client_qos_fd);
                 exit(1);
             }
+			cout << "Qos enviadas" << endl;
         }
     }
 }
@@ -190,6 +195,7 @@ void servtags(ControlColas& monitorTags,Socket socket_tags,int client_tags_fd){
                 socket_tags.Close(client_tags_fd);
                 exit(1);
             }
+			cout << "Tags enviadas" << endl;
         }
     }
 }
