@@ -87,8 +87,13 @@ void mostrarDatosTags(){
 
     tag tagaux[NumMostrados];
     int vectorHoras[24] = {0};
-    int auxvector1[NumMostrados] = {0};
-    int auxvector2[NumMostrados] = {0};
+    int auxvector1[NumMostrados];
+    int auxvector2[NumMostrados];
+
+    for(unsigned int i = 0; i<NumMostrados; i++){
+        auxvector1[i]=0;
+        auxvector2[i]=0;
+    }
     for(unsigned int i = 0; i < NumMostrados; i++){
         tagaux[i].num_veces = 0;
     }
@@ -98,25 +103,6 @@ void mostrarDatosTags(){
 
         vectorHoras[hora(vectorTags[i].fecha)/1000]++; //esta aberracion va contando los tweets y sus horas
 
-        /*
-        for(unsigned int j= 0; j < NumMostrados; j++){
-            cout << "Entra al for1 iteracion " << j << endl;
-            if(vectorTags[i].num_veces > tagaux[j].num_veces){
-                for(unsigned int l = NumMostrados; l>j; l--){
-                    cout << "entra al for2 iteracion " << 10-l+j << endl; 
-                    tagaux[l].nombre = tagaux[l-1].nombre;
-                    tagaux[l].num_veces = tagaux[l-1].num_veces;
-                }
-                //aqui
-                cout << "Prueba1" << endl;
-                tagaux[j].nombre=vectorTags[i].nombre;
-                cout << "Prueba2" << endl;
-                tagaux[j].num_veces = vectorTags[i].num_veces;
-                cout << "Prueba3" << endl;                
-                //j = NumMostrados;
-            }
-        }
-        */
        for(unsigned int j = 0; j<NumMostrados; j++){
             if(vectorTags[i].num_veces > tagaux[j].num_veces){ // miramos solo los tags a la derecha de este
                 for(unsigned int l = NumMostrados; l > j + 1; l--){ //desplazamos todos los tags de tagaux a la derecha
@@ -232,19 +218,18 @@ void canalTags(const int &puerto){
         }
         string bufferaux = "";
         //cout << "Recibo los tags"<<endl;
-        for(unsigned int i = 0; i< TAMMANO_PAQUETES_REDUCIDOS; i++){
-            rcv_bytes = chanTags.Recv(socketTags_fd, bufferaux, length);
+
+            rcv_bytes = chanTags.Recv(socketTags_fd, buffer, length);
             if(rcv_bytes == -1) {
             string mensError(strerror(errno));
             cerr << "Error al recibir datos: " + mensError + "\n";
             // Cerramos los sockets
             chanTags.Close(socketTags_fd);
         }
-        buffer += bufferaux;
-        bufferaux = "";
-        }
+        buffer;
+        
 
-        //cout << "Hemos recibido los tags" << endl;
+        //cout << "Hemos recibido los tags " << buffer  <<endl;
         //cout << buffer << endl;
         //FECHA;#TAG1;#TAG2;#TAG3...
 
@@ -370,7 +355,7 @@ void canalQOS(const int &puerto){
             // Cerramos los sockets
             chanQOS.Close(socketQOS_fd);
         }
-        //cout << "Hemos recibido los QOS" << endl;
+        //cout << "Hemos recibido los QOS " << bufferQOS <<endl;
         //cout << bufferQOS << endl;
         //nos pasan un string con los resultados de analizar un paquete de 5 tweets. Esta organizado de la siguiente manera:
         //empieza por el numero de tags que habia en el tweet, el DELIMITADOR ";" , el tiempo que le ha costado encontrarlo,
@@ -417,8 +402,6 @@ void canalQOS(const int &puerto){
 void cliente(){
     while(true){
         this_thread::sleep_for(chrono::seconds(tiempoDeEspera));
-        cout << "aqui" << endl;
-
         //cout << "se va a escibir por pantalla " << endl;
         mostrarDatosTags();
         mostrarDatosQOS();
