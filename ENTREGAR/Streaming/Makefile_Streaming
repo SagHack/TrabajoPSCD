@@ -1,0 +1,40 @@
+#**********************************************************************************
+# File:   Makefile_Streaming
+# Author: Equipo 11:
+#         818058 Héctor Arcega Vela          820417 Cecilia Monteagudo Redrado
+#         815935 Berta Olano Guillén         820949 Carlos Palomera Oliva
+#         815767 Alonso Lucas Juberías       821038 Simón Alonso Gutiérrez       
+# Date:   enero 2022
+# Coms:   Makefile para el proceso Streaming del trabajo de PSCD
+#         "make -f Makefile_Streaming" construye el ejecutable
+#	  Ejecutar "make -f Makefile_Streaming clean" para limpiar (borrar lo que genere)
+#**********************************************************************************
+CC=g++
+STREAMING=ServicioStreaming
+SOCKET_DIR=Socket
+SOCKET=${SOCKET_DIR}/Socket
+EJEC = ServicioStreaming
+CPPFLAGS=-I. -I${SOCKET_DIR} -O2 -std=c++11 -lsockets # Flags compilacion
+LDFLAGS=-pthread # Flags linkado threads
+#----------------------------------------------------------------------------
+#Para gestionar opciones de compilación según la máquina: hendrix tiene sus manías
+#Descomentar la siguiente línea para compilar en hendrix
+SOCKETSFLAGS=-lsocket -lnsl
+#-----------------------------------------------------------
+# STREAMING
+# Linkado
+${STREAMING}: ${SOCKET}.o ${STREAMING}.o  
+	${CC} ${LDFLAGS} ${SOCKET}.o ${STREAMING}.o -o ${EJEC} ${SOCKETSFLAGS}
+# Compilacion
+${STREAMING}.o: ${STREAMING}.cpp
+	${CC} -c ${CPPFLAGS} ${STREAMING}.cpp
+#-----------------------------------------------------------
+# SOCKETS
+# Compilacion libreria de Sockets
+${SOCKET}.o: ${SOCKET}.hpp ${SOCKET}.cpp
+	${CC} -c ${CPPFLAGS} ${SOCKET}.cpp -o ${SOCKET}.o
+#-----------------------------------------------------------
+# LIMPIEZA
+clean:
+	$(RM) ${SOCKET}.o
+	$(RM) ${STREAMING} ${STREAMING}.o
