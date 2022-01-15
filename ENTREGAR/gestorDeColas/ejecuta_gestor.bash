@@ -5,7 +5,7 @@
 if [[ "$#" -ne 5 ]]
 then
 	
-	echo "Error en los paremtros de invocación"
+	echo "Error en los parametros de invocación"
 	exit
 fi
 
